@@ -32,6 +32,20 @@ app.use(requestLogger);
 // Trust proxy (if behind reverse proxy like nginx)
 app.set("trust proxy", 1);
 
+// Root route
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "API is running",
+    version: "1.0.0",
+    endpoints: {
+      health: "/api/health",
+      user: "/api/user",
+      admin: "/api/admin"
+    }
+  });
+});
+
 // API Routes
 app.use("/api", routes);
 
@@ -46,20 +60,27 @@ async function start() {
     // Connect to database
     await connectDB();
 
-    const port = config?.app?.port ?? 3000;
-    app.listen(port, () => {
-      console.log("=================================");
-      console.log(`🚀 Server running on port ${port}`);
-      console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`🔗 API: http://localhost:${port}/api`);
-      console.log("=================================");
-    });
+    // Only start the server if not in Vercel environment
+    // Vercel handles the server startup automatically
+    if (process.env.VERCEL !== "1") {
+      const port = config?.app?.port ?? 3000;
+      app.listen(port, () => {
+        console.log("=================================");
+        console.log(`🚀 Server running on port ${port}`);
+        console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
+        console.log(`🔗 API: http://localhost:${port}/api`);
+        console.log("=================================");
+      });
+    } else {
+      console.log("🚀 Running on Vercel serverless environment");
+    }
   } catch (err) {
     console.error("❌ Failed to start server:", err);
     process.exit(1);
   }
 }
 
+// Initialize database connection
 start();
 
 export default app;
