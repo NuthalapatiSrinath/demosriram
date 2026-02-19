@@ -247,9 +247,18 @@ export const getContactStatsController = async (req, res) => {
     }
 
     const totalContacts = await Contact.countDocuments(query);
-    const pendingContacts = await Contact.countDocuments({ ...query, status: "pending" });
-    const contactedContacts = await Contact.countDocuments({ ...query, status: "contacted" });
-    const resolvedContacts = await Contact.countDocuments({ ...query, status: "resolved" });
+    const pendingContacts = await Contact.countDocuments({
+      ...query,
+      status: "pending",
+    });
+    const contactedContacts = await Contact.countDocuments({
+      ...query,
+      status: "contacted",
+    });
+    const resolvedContacts = await Contact.countDocuments({
+      ...query,
+      status: "resolved",
+    });
 
     // Contacts in last 7 days
     const sevenDaysAgo = new Date();

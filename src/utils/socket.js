@@ -49,7 +49,8 @@ export const initializeSocket = (server) => {
 
 export const getIO = () => {
   if (!io) {
-    throw new Error("Socket.io not initialized!");
+    console.warn("⚠️  Socket.io not initialized (might be in serverless environment)");
+    return null;
   }
   return io;
 };
@@ -57,21 +58,25 @@ export const getIO = () => {
 // Emit new activity to admin panels tracking this user
 export const emitUserActivity = (userId, activityData) => {
   try {
-    if (io) {
-      // Emit to specific user detail page
-      io.to(`user-activity-${userId}`).emit("user-activity-update", {
-        ...activityData,
-        userId,
-        timestamp: new Date(),
-      });
-      // Emit to analytics page (all admins)
-      io.to("admin-analytics").emit("analytics-update", {
-        userId,
-        activityType: activityData.activityType,
-        timestamp: new Date(),
-      });
-      console.log(`📡 Emitted activity for user ${userId}`);
+    // Skip if Socket.io not initialized (serverless environment)
+    if (!io) {
+      console.log("⚠️  Socket.io not available - skipping real-time update");
+      return;
     }
+    
+    // Emit to specific user detail page
+    io.to(`user-activity-${userId}`).emit("user-activity-update", {
+      ...activityData,
+      userId,
+      timestamp: new Date(),
+    });
+    // Emit to analytics page (all admins)
+    io.to("admin-analytics").emit("analytics-update", {
+      userId,
+      activityType: activityData.activityType,
+      timestamp: new Date(),
+    });
+    console.log(`📡 Emitted activity for user ${userId}`);
   } catch (error) {
     console.error("Error emitting user activity:", error);
   }
