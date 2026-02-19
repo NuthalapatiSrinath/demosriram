@@ -11,8 +11,8 @@ import { config } from "../src/config/index.js";
 const adminUsers = [
   {
     name: "Sriram Kumar",
-    email: "superadmin@sriram.com",
-    password: "SuperAdmin123!",
+    email: "superadmin@gmail.com",
+    password: "panacea",
     role: "superadmin",
     centerName: "All Centers",
     isVerified: true,

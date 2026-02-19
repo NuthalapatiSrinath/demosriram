@@ -9,6 +9,7 @@ export const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
+    console.log("❌ Auth middleware: No Bearer token in header");
     return res.status(401).json({
       success: false,
       message: "Unauthorized - No token provided",
@@ -16,12 +17,21 @@ export const authenticate = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1];
+  console.log(
+    `🔍 Auth middleware: Verifying token (first 20 chars): ${token.substring(0, 20)}...`,
+  );
 
   try {
     const payload = jwt.verify(token, config.jwt.accessSecret);
+    console.log(
+      `✅ Auth middleware: Token valid for user ${payload.sub} (${payload.email})`,
+    );
     req.user = payload; // { sub: userId, role: 'user'/'admin', email: '...' }
     return next();
   } catch (err) {
+    console.log(
+      `❌ Auth middleware: Token verification failed - ${err.name}: ${err.message}`,
+    );
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({
         success: false,

@@ -256,3 +256,88 @@ export const createAdminController = async (req, res) => {
     });
   }
 };
+
+/**
+ * @route   POST /api/admin/auth/refresh-token
+ * @desc    Refresh access token using refresh token
+ * @access  Public (but requires valid refresh token)
+ */
+export const adminRefreshTokenController = async (req, res) => {
+  try {
+    const refreshToken =
+      req.cookies[config.jwt.refreshCookieName] || req.body.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token required",
+      });
+    }
+
+    // Verify refresh token
+    let payload;
+    try {
+      payload = jwt.verify(refreshToken, config.jwt.refreshSecret);
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid or expired refresh token",
+      });
+    }
+
+    // Check if refresh token exists in database and is active
+    const storedToken = await RefreshToken.findOne({ token: refreshToken });
+    if (!storedToken || storedToken.revokedByIp) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token revoked or not found",
+      });
+    }
+
+    if (storedToken.expiresAt < new Date()) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token expired",
+      });
+    }
+
+    // Get user
+    const user = await User.findById(payload.sub);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Verify user is admin
+    const allowedRoles = ["admin", "superadmin", "centeradmin", "staff"];
+    if (!allowedRoles.includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin privileges required.",
+      });
+    }
+
+    // Generate new access token
+    const newAccessToken = generateAccessToken({
+      sub: user._id,
+      role: user.role,
+      email: user.email,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Token refreshed successfully",
+      data: {
+        accessToken: newAccessToken,
+      },
+    });
+  } catch (err) {
+    console.error("adminRefreshTokenController error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error during token refresh",
+    });
+  }
+};

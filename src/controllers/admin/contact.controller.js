@@ -157,6 +157,40 @@ export const updateContactController = async (req, res) => {
 };
 
 /**
+ * @route   PATCH /api/admin/contacts/:id/resolve
+ * @desc    Mark contact as resolved
+ * @access  Protected (Admin)
+ */
+export const resolveContactController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const contact = await Contact.findById(id);
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact not found",
+      });
+    }
+
+    contact.status = "resolved";
+    await contact.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Contact marked as resolved",
+      data: contact,
+    });
+  } catch (err) {
+    console.error("resolveContactController error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while resolving contact",
+    });
+  }
+};
+
+/**
  * @route   DELETE /api/admin/contacts/:id
  * @desc    Delete contact
  * @access  Protected (Super Admin)

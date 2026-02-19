@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { createServer } from "http";
 import { connectDB } from "./../database/index.js";
 import { config } from "./../config/index.js";
 import routes from "./../routes/index.js";
@@ -12,8 +13,10 @@ import {
   requestLogger,
 } from "./../middleware/security.js";
 import { errorHandler, notFoundHandler } from "./../middleware/errorHandler.js";
+import { initializeSocket } from "./../utils/socket.js";
 
 const app = express();
+const httpServer = createServer(app);
 
 // Security Middleware
 app.use(helmetMiddleware);
@@ -41,8 +44,8 @@ app.get("/", (req, res) => {
     endpoints: {
       health: "/api/health",
       user: "/api/user",
-      admin: "/api/admin"
-    }
+      admin: "/api/admin",
+    },
   });
 });
 
@@ -60,15 +63,20 @@ async function start() {
     // Connect to database
     await connectDB();
 
+    // Initialize Socket.io
+    const io = initializeSocket(httpServer);
+    console.log("✅ Socket.io initialized");
+
     // Only start the server if not in Vercel environment
     // Vercel handles the server startup automatically
     if (process.env.VERCEL !== "1") {
       const port = config?.app?.port ?? 3000;
-      app.listen(port, () => {
+      httpServer.listen(port, () => {
         console.log("=================================");
         console.log(`🚀 Server running on port ${port}`);
         console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
         console.log(`🔗 API: http://localhost:${port}/api`);
+        console.log(`📡 Socket.io ready for real-time updates`);
         console.log("=================================");
       });
     } else {

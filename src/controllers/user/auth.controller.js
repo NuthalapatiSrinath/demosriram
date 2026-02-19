@@ -215,14 +215,15 @@ export const loginController = async (req, res) => {
       });
     }
 
-    // Check if email is verified (required for regular users, admins are auto-verified)
-    if (!user.isVerified && user.role === "user") {
-      return res.status(403).json({
-        success: false,
-        message:
-          "Please verify your email before logging in. Check your inbox for the verification link.",
-      });
-    }
+    // Check if email is verified (TEMPORARILY DISABLED FOR DEVELOPMENT)
+    // For production, uncomment this block
+    // if (!user.isVerified && user.role === "user") {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message:
+    //       "Please verify your email before logging in. Check your inbox for the verification link.",
+    //   });
+    // }
 
     // Validate password
     const isValid = await user.validatePassword(password);
@@ -244,6 +245,14 @@ export const loginController = async (req, res) => {
       sub: user._id,
       role: user.role,
     });
+
+    console.log(`✅ Login successful for user ${user._id} (${user.email})`);
+    console.log(
+      `   Access token (first 20 chars): ${accessToken.substring(0, 20)}...`,
+    );
+    console.log(
+      `   Refresh token (first 20 chars): ${refreshToken.substring(0, 20)}...`,
+    );
 
     // Store refresh token in database
     const expiresAt = new Date(
@@ -352,6 +361,13 @@ export const refreshTokenController = async (req, res) => {
       role: user.role,
       email: user.email,
     });
+
+    console.log(
+      `🔄 Generated new access token for user ${user._id} (${user.email})`,
+    );
+    console.log(
+      `   Token (first 20 chars): ${newAccessToken.substring(0, 20)}...`,
+    );
 
     return res.status(200).json({
       success: true,

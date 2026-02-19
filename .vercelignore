@@ -1,0 +1,61 @@
+# Dependencies
+
+node_modules
+
+# Environment files
+
+.env
+.env.\*
+.env.local
+.env.production
+.env.development
+.env.test
+
+# Documentation
+
+README.md
+API_DOCUMENTATION.md
+IMPLEMENTATION_SUMMARY.md
+POSTMAN_COLLECTION.md
+QUICK_START.md
+SEED_GUIDE.md
+VERCEL_DEPLOYMENT.md
+
+# Testing
+
+test-api.js
+test.js
+_.test.js
+_.spec.js
+
+# Git
+
+.git
+.gitignore
+
+# IDE
+
+.vscode
+.idea
+.DS_Store
+
+# Logs
+
+\*.log
+logs
+
+# Build artifacts
+
+dist
+build
+coverage
+
+# Scripts (optional - keep if needed for Vercel)
+
+# scripts/
+
+# Lock files (Vercel installs from package.json)
+
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

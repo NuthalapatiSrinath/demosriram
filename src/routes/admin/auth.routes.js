@@ -5,6 +5,7 @@ import {
   adminLogoutController,
   getAdminMeController,
   createAdminController,
+  adminRefreshTokenController,
 } from "../../controllers/admin/auth.controller.js";
 import {
   changePasswordController,
@@ -18,6 +19,7 @@ const router = express.Router();
 
 // PUBLIC ROUTES
 router.post("/login", rateLimitMiddleware, adminLoginController);
+router.post("/refresh-token", adminRefreshTokenController);
 router.post("/forgot-password", rateLimitMiddleware, forgotPasswordController);
 router.post("/reset-password", resetPasswordController);
 

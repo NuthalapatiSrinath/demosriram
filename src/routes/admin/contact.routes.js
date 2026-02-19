@@ -1,9 +1,9 @@
-// src/routes/admin/contact.routes.js
 import express from "express";
 import {
   getAllContactsController,
   getContactByIdController,
   updateContactController,
+  resolveContactController,
   deleteContactController,
   getContactStatsController,
 } from "../../controllers/admin/contact.controller.js";
@@ -18,6 +18,7 @@ router.get("/", getAllContactsController);
 router.get("/stats", getContactStatsController);
 router.get("/:id", getContactByIdController);
 router.put("/:id", updateContactController);
+router.patch("/:id/resolve", resolveContactController);
 router.delete("/:id", deleteContactController);
 
 export default router;

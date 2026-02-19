@@ -1,6 +1,7 @@
 // src/controllers/user/activity.controller.js
 import UserActivity from "../../database/models/userActivity.model.js";
 import User from "../../database/models/user/user.model.js";
+import { emitUserActivity } from "../../utils/socket.js";
 
 /**
  * @route   POST /api/user/activity/track
@@ -9,11 +10,13 @@ import User from "../../database/models/user/user.model.js";
  */
 export const trackActivity = async (req, res) => {
   try {
-    const userId = req.user?._id;
+    // req.user comes from JWT payload: { sub: userId, role, email }
+    const userId = req.user?.sub;
     if (!userId) {
+      console.error("⚠️ trackActivity: No user ID in request", req.user);
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "Unauthorized - User ID not found",
       });
     }
 
@@ -42,6 +45,9 @@ export const trackActivity = async (req, res) => {
 
     const activity = await UserActivity.create(activityData);
 
+    // Emit real-time update to connected admin panels
+    emitUserActivity(userId.toString(), activity.toObject());
+
     return res.status(201).json({
       success: true,
       data: activity,
@@ -62,11 +68,13 @@ export const trackActivity = async (req, res) => {
  */
 export const trackBatchActivities = async (req, res) => {
   try {
-    const userId = req.user?._id;
+    // req.user comes from JWT payload: { sub: userId, role, email }
+    const userId = req.user?.sub;
     if (!userId) {
+      console.error("⚠️ trackBatchActivities: No user ID in request", req.user);
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "Unauthorized - User ID not found",
       });
     }
 
@@ -98,7 +106,12 @@ export const trackBatchActivities = async (req, res) => {
       timestamp: activity.timestamp || new Date(),
     }));
 
-    await UserActivity.insertMany(activitiesData);
+    const savedActivities = await UserActivity.insertMany(activitiesData);
+
+    // Emit real-time updates for each activity
+    savedActivities.forEach((activity) => {
+      emitUserActivity(userId.toString(), activity.toObject());
+    });
 
     return res.status(201).json({
       success: true,
@@ -120,7 +133,7 @@ export const trackBatchActivities = async (req, res) => {
  */
 export const getMyJourney = async (req, res) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.sub;
     const { startDate, endDate, activityType, limit = 100 } = req.query;
 
     const query = { user: userId };
@@ -161,7 +174,7 @@ export const getMyJourney = async (req, res) => {
  */
 export const getMyStats = async (req, res) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.sub;
 
     // Get activity breakdown
     const activityBreakdown = await UserActivity.aggregate([
