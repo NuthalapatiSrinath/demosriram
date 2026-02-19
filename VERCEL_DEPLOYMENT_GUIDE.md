@@ -18,6 +18,7 @@ Your backend was failing on Vercel due to **MongoDB connection timeouts**. This 
 Go to your Vercel project settings and add these environment variables:
 
 **Required:**
+
 ```
 DATABASE_URL=mongodb+srv://srinath:srinath@demo.2mv43df.mongodb.net/?retryWrites=true&w=majority&appName=demo
 JWT_SECRET=your_jwt_secret_here
@@ -26,6 +27,7 @@ NODE_ENV=production
 ```
 
 **Optional (Email):**
+
 ```
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -71,6 +73,7 @@ After deployment completes:
 ### Real-Time Updates Won't Work on Vercel
 
 **Socket.io doesn't work** in Vercel's serverless environment because:
+
 - Serverless functions are stateless
 - WebSocket connections require persistent connections
 - Vercel functions timeout after 60 seconds
@@ -80,11 +83,13 @@ After deployment completes:
 ### Local Development Still Works
 
 When running locally (`npm run dev`):
+
 - ✅ Socket.io works
 - ✅ Real-time updates work
 - ✅ WebSocket connections work
 
 When deployed on Vercel:
+
 - ❌ Socket.io disabled
 - ✅ Polling fallback works
 - ✅ All API endpoints work
@@ -115,14 +120,17 @@ When deployed on Vercel:
 ### Common Errors:
 
 **Error: "MongooseError: Operation buffering timed out"**
+
 - **Cause:** Cannot connect to MongoDB
 - **Fix:** Check IP whitelist in MongoDB Atlas
 
 **Error: "MongoServerSelectionError: connection refused"**
+
 - **Cause:** Wrong connection string or MongoDB cluster is down
 - **Fix:** Verify `DATABASE_URL` in Vercel settings
 
 **Error: "Authentication failed"**
+
 - **Cause:** Wrong username/password in connection string
 - **Fix:** Update credentials in `DATABASE_URL`
 

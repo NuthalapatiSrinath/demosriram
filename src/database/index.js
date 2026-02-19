@@ -13,8 +13,8 @@ export const connectDB = async () => {
 
   try {
     // Configure Mongoose for serverless
-    mongoose.set('strictQuery', false);
-    
+    mongoose.set("strictQuery", false);
+
     const connection = await mongoose.connect(config.db.url, {
       serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
       socketTimeoutMS: 45000,

@@ -49,7 +49,9 @@ export const initializeSocket = (server) => {
 
 export const getIO = () => {
   if (!io) {
-    console.warn("⚠️  Socket.io not initialized (might be in serverless environment)");
+    console.warn(
+      "⚠️  Socket.io not initialized (might be in serverless environment)",
+    );
     return null;
   }
   return io;
@@ -63,7 +65,7 @@ export const emitUserActivity = (userId, activityData) => {
       console.log("⚠️  Socket.io not available - skipping real-time update");
       return;
     }
-    
+
     // Emit to specific user detail page
     io.to(`user-activity-${userId}`).emit("user-activity-update", {
       ...activityData,

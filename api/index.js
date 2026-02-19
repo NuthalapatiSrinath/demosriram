@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   try {
     // Ensure database is connected before handling request
     await connectDB();
-    
+
     // Let Express handle the request
     return app(req, res);
   } catch (error) {
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message
+      error: error.message,
     });
   }
 }
