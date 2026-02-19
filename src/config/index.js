@@ -7,7 +7,7 @@ import { dbConfig } from "./db.config.js";
 export const config = {
   app: {
     ...appConfig,
-    frontendUrl: process.env.FRONTEND_URL || "http://192.168.8.111:3001",
+    frontendUrl: process.env.FRONTEND_URL || "https://srirams-gold.vercel.app",
   },
 
   db: dbConfig,

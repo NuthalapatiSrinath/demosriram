@@ -215,15 +215,13 @@ export const loginController = async (req, res) => {
       });
     }
 
-    // Check if email is verified (TEMPORARILY DISABLED FOR DEVELOPMENT)
-    // For production, uncomment this block
-    // if (!user.isVerified && user.role === "user") {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message:
-    //       "Please verify your email before logging in. Check your inbox for the verification link.",
-    //   });
-    // }
+    // Check if email is verified
+    if (!user.isVerified && user.role === "user") {
+      return res.status(403).json({
+        success: false,
+        message: "Please verify your email before logging in. Check your inbox for the verification link.",
+      });
+    }
 
     // Validate password
     const isValid = await user.validatePassword(password);
